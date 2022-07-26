@@ -1,20 +1,19 @@
-import { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
+import { useState } from 'react';
+import { routes } from './utils/routes';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import Layout from './components/Layout';
 
 export default function App() {
-	const titleRef = useRef<HTMLHeadingElement>(null);
+	const [user, setUser] = useState<boolean>(true);
 
-	useEffect(() => {
-		if (titleRef) {
-			gsap.to(titleRef.current, { autoAlpha: 1, duration: 3 });
-		}
-	}, [titleRef]);
+	const renderRoutes = routes.map((route) => {
+		if (route.isProtected) return <Route path={route.path} element={user ? <Layout>{<route.element />}</Layout> : <Navigate to="/login" />} />;
+		return <Route path={route.path} element={<Layout>{<route.element />}</Layout>} />;
+	});
 
 	return (
-		<div>
-			<h1 ref={titleRef} className="text-3xl font-bold underline invisible">
-				Customer Information Management
-			</h1>
-		</div>
+		<BrowserRouter>
+			<Routes>{renderRoutes}</Routes>
+		</BrowserRouter>
 	);
 }
